@@ -11,6 +11,24 @@ const { CHU_HO, RELATIONSHIPS } = X;
 const BLOCK_BOUNDARY = 328; // duoi dong nay la khoi du lieu thu 2 (schema rut gon)
 
 /**
+ * Ban do cot KHAC NHAU giua cac to (do nguoi danh nham moi to bam 1 khuu vay).
+ * To 1: ten o cot C, quan he o I. To 2: ten o B, quan he o I, co them "Tra ben BHXH" o D.
+ * To 4: ten o B, quan he o H, tuoi o I.
+ * To nao chua biet -> dung mac dinh (giong To 1) va canh bao.
+ */
+const COT_THEO_TO = {
+  1: { ten: 3, sttNguoi: 2, maBH: 4, ngaySinh: 5, cccd: 6, ngayCap: 7, tuoi: 8, quanHe: 9, dienThoai: 10, ngheNghiep: 14, ghiChu: 25, datDai: 15 },
+  2: { ten: 2, sttNguoi: 1, maBH: 3, ngaySinh: 5, cccd: 6, ngayCap: 7, tuoi: 8, quanHe: 9, dienThoai: 10, ngheNghiep: 14, ghiChu: 25, datDai: 15 },
+  4: { ten: 2, sttNguoi: 1, maBH: 3, ngaySinh: 5, cccd: 6, ngayCap: 7, tuoi: 9, quanHe: 8, dienThoai: 10, ngheNghiep: 15, ghiChu: 26, datDai: 16 },
+};
+const COT_MAC_DINH = COT_THEO_TO[1];
+
+/** Chuoi "Cot X" de canh bao, 1 -> A */
+function tenCot(n) {
+  return n <= 0 ? '(khong co)' : String.fromCharCode(64 + n);
+}
+
+/**
  * Pham vi khoi phuc STT ho bang CCCD.
  * Nguoi dung xac nhan: chi khoi phuc vung bi chon dong o giua hộ 20 và hộ 78
  * (dong 149..325). Cac dong thanh vien ben ngoai giu nguyen cot A trong.
@@ -58,7 +76,9 @@ const mucOf = (code) => (GHI_CHU_CODES.has(code) ? MUC.GHI_CHU : MUC.CANH_BAO);
  * @param {Array<{row:number,c:object}>} rows  hang cua sheet
  * @returns {{people: Array<object>, issues: Array<object>}}
  */
-function parseTo1(rows) {
+function parseTo1(rows, to) {
+  const C = COT_THEO_TO[to] || COT_MAC_DINH;
+  const bietSchema = !!COT_THEO_TO[to];
   const people = [];
   const issues = [];
   const flag = (p, code, msg) =>
@@ -69,7 +89,7 @@ function parseTo1(rows) {
 
   for (const r of rows) {
     if (r.row < 3) continue;
-    const hoTen = X.txt(r.c[3]);
+    const hoTen = X.txt(r.c[C.ten]);
     if (!hoTen) continue;
 
     const aRaw = X.txt(r.c[1]);
@@ -84,10 +104,14 @@ function parseTo1(rows) {
     let quanHe = '';
     let quanHeCol = '';
     for (const [col, label] of [
+      [C.quanHe, String.fromCharCode(64 + C.quanHe)],
+      [C.quanHe - 1, String.fromCharCode(63 + C.quanHe)],
+      [C.quanHe + 1, String.fromCharCode(65 + C.quanHe)],
       [9, 'I'],
       [8, 'H'],
       [7, 'G'],
     ]) {
+      if (col < 1 || col > 60) continue;
       if (RELATIONSHIPS.includes(X.txt(r.c[col]))) {
         quanHe = X.txt(r.c[col]);
         quanHeCol = label;
@@ -96,25 +120,25 @@ function parseTo1(rows) {
     }
 
     // --- ngay sinh / CCCD: dong bi lech cot khi CCCD nham o cot E ---
-    let nsRaw = X.txt(r.c[5]);
-    const cccdRaw = X.txt(r.c[6]);
+    let nsRaw = X.txt(r.c[C.ngaySinh]);
+    const cccdRaw = X.txt(r.c[C.cccd]);
     let rowShifted = false;
     if (/^\d{12}$/.test(nsRaw) && cccdRaw === '') rowShifted = true;
 
-    let ngaySinh = rowShifted ? '' : X.isoDate(r.c[5]);
-    const cccd = rowShifted ? nsRaw : X.cccdOf(r.c[6]);
-    const ngayCap = rowShifted ? '' : X.isoDate(r.c[7]);
+    let ngaySinh = rowShifted ? '' : X.isoDate(r.c[C.ngaySinh]);
+    const cccd = rowShifted ? nsRaw : X.cccdOf(r.c[C.cccd]);
+    const ngayCap = rowShifted ? '' : X.isoDate(r.c[C.ngayCap]);
 
     // --- tuoi: chi khoi 1 co ---
     let tuoi = null;
     if (r.row <= BLOCK_BOUNDARY) {
-      const t = X.intOf(r.c[8]);
+      const t = X.intOf(r.c[C.tuoi]);
       if (t != null) tuoi = t;
-      else if (X.txt(r.c[8]) !== '') flag({ row: r.row, hoTen }, 'TUOI_KHONG_PHAI_SO', `Gia tri "${X.txt(r.c[8])}"`);
+      else if (X.txt(r.c[C.tuoi]) !== '') flag({ row: r.row, hoTen }, 'TUOI_KHONG_PHAI_SO', `Gia tri "${X.txt(r.c[C.tuoi])}"`);
     }
 
     // --- ma bao hiem ---
-    let maBH = X.txt(r.c[4]);
+    let maBH = X.txt(r.c[C.maBH]);
     const khongBH = maBH === X.KHONG_CO;
     if (khongBH) maBH = '';
 
@@ -126,28 +150,28 @@ function parseTo1(rows) {
       hoGoc: curHoFwd,
       isHeadRow,
       hoTen,
-      sttNguoiGoc: X.txt(r.c[2]),
+      sttNguoiGoc: X.txt(r.c[C.sttNguoi]),
       quanHe,
       quanHeCol,
       maBH,
       khongBH,
       ngaySinh,
-      ngaySinhRaw: X.txt(r.c[5]),
+      ngaySinhRaw: X.txt(r.c[C.ngaySinh]),
       cccd,
       ngayCap,
       tuoi,
-      dienThoai: X.txt(r.c[10]),
+      dienThoai: X.txt(r.c[C.dienThoai]),
       duHoc: X.txt(r.c[11]),
       layChong: X.txt(r.c[12]),
       xkld: X.txt(r.c[13]),
-      ngheNghiep: X.txt(r.c[14]),
-      ghiChu: X.txt(r.c[25]),
+      ngheNghiep: X.txt(r.c[C.ngheNghiep]),
+      ghiChu: X.txt(r.c[C.ghiChu]),
       datDai: {
-        lua: { dienTich: X.txt(r.c[15]) },
-        vuon: { cay: X.txt(r.c[16]), soLuong: X.txt(r.c[17]), dienTich: X.txt(r.c[18]) },
-        rauMau: { tenRau: X.txt(r.c[19]), dienTich: X.txt(r.c[20]) },
-        ao: { tenNuoi: X.txt(r.c[21]), soLuong: X.txt(r.c[22]) },
-        chanNuoi: { giaXuc: X.txt(r.c[23]), giaCam: X.txt(r.c[24]) },
+        lua: { dienTich: X.txt(r.c[C.datDai]) },
+        vuon: { cay: X.txt(r.c[C.datDai + 1]), soLuong: X.txt(r.c[C.datDai + 2]), dienTich: X.txt(r.c[C.datDai + 3]) },
+        rauMau: { tenRau: X.txt(r.c[C.datDai + 4]), dienTich: X.txt(r.c[C.datDai + 5]) },
+        ao: { tenNuoi: X.txt(r.c[C.datDai + 6]), soLuong: X.txt(r.c[C.datDai + 7]) },
+        chanNuoi: { giaXuc: X.txt(r.c[C.datDai + 8]), giaCam: X.txt(r.c[C.datDai + 9]) },
       },
       canhBao: [],
       hoTra: null,
@@ -158,17 +182,19 @@ function parseTo1(rows) {
       nguonHo: '',
     };
     if (rowShifted) p.canhBao.push('DONG_BI_LECH_COT_DA_KHOI_PHUCCCD');
+    if (!bietSchema)
+      p.canhBao.push('CHUA_BIET_BAN_DO_COT_SU_DUNG_MAC_DINH_CUA_TO_1');
 
     // canh bao
     if (!quanHe) flag(p, 'THIEU_QUAN_HE', "Khong co o 'chu ho' / 'thanh vien'");
     if (rowShifted) {
-      flag(p, 'DONG_BI_LECH_COT', `CCCD "${nsRaw}" nam o cot E, quan he o cot G (thay vi F va I)`);
+      flag(p, 'DONG_BI_LECH_COT', `CCCD "${nsRaw}" nam o cot ${tenCot(C.ngaySinh)}, quan he o cot ${tenCot(C.quanHe)} (thay vi ${tenCot(C.cccd)} va ${tenCot(C.quanHe)})`);
     } else if (!ngaySinh) {
-      if (nsRaw === '') flag(p, 'THIEU_NGAY_SINH', 'Cot E trong');
+      if (nsRaw === '') flag(p, 'THIEU_NGAY_SINH', `Cot ${tenCot(C.ngaySinh)} trong`);
       else flag(p, 'NGAY_SINH_KHONG_DOC_DUOC', `Gia tri "${nsRaw}" khong phai ngay sinh`);
     }
-    if (!rowShifted && X.txt(r.c[7]) !== '' && !ngayCap) {
-      flag(p, 'NGAY_CAP_KHONG_DOC_DUOC', `Gia tri "${X.txt(r.c[7])}"`);
+    if (!rowShifted && X.txt(r.c[C.ngayCap]) !== '' && !ngayCap) {
+      flag(p, 'NGAY_CAP_KHONG_DOC_DUOC', `Gia tri "${X.txt(r.c[C.ngayCap])}"`);
     }
     if (!cccd) {
       if (cccdRaw !== '') flag(p, 'CCCD_KHONG_DUNG_DOI', `Gia tri "${cccdRaw}" khong phai 12 so`);
@@ -461,8 +487,26 @@ function buildHouseholds(people, issues) {
     }
   }
 
-  // nhom mo co: khong xac dinh duoc ho -> tach rieng, canh bao
+  // --- LUOT 2b: ghep nhom "mo co" (M...) vao ho da tao, khi ho do xuat hien
+  // SAU trong file. Tổ 4 co 130 dong thành viên o đầu file (dong 3-132) nên
+  // lúc duyet, ho cua ho chua duoc tao -> tam o orphan; den dong 133+ moi
+  // thay chu ho. Chi ghep khi STT ho khop DUC 1 nhom, khong doan.
+  const orphanGhep = [];
   for (const p of orphan) {
+    if (p.sttHo > 0) {
+      const c = byStt.get(p.sttHo);
+      if (c && c.length === 1) {
+        attach(c[0], p);
+        p.canhBao.push('DA_GHEP_VAO_HO_SAU_KHI_KHOI_PHUCCCD');
+        continue;
+      }
+      if (c && c.length > 1) p.canhBao.push('STT_HO_TRUNG_TRONG_DANH_SACH');
+    }
+    orphanGhep.push(p);
+  }
+
+  // nhom mo co: khong xac dinh duoc ho -> tach rieng, canh bao
+  for (const p of orphanGhep) {
     const g = {
       key: `M${p.row}`,
       sttHo: 0,
@@ -539,7 +583,7 @@ function buildHouseholds(people, issues) {
 
 /** Chay tron: duong dan file -> du lieu da gom nhom */
 function build({ to1Rows, lookupRows, ap, to, recoverRange }) {
-  const { people, issues } = parseTo1(to1Rows);
+  const { people, issues } = parseTo1(to1Rows, to);
   const lookup = parseLookup(lookupRows);
   const idx = indexLookup(lookup);
   const match = matchLookup(people, idx);
@@ -590,4 +634,5 @@ module.exports = {
   MUC,
   BLOCK_BOUNDARY,
   RECOVER_RANGE,
+  COT_THEO_TO,
 };

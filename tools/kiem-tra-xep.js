@@ -1,10 +1,22 @@
 'use strict';
-/** Kiem tra file da xep: moi ho phai la 1 khoi lien, 1 chu ho, cot A khop */
+/**
+ * Kiem tra file da xep: moi ho phai la 1 khoi lien, 1 chu ho, cot A khop.
+ *   node tools/kiem-tra-xep.js --to 2
+ *   node tools/kiem-tra-xep.js "output\Danh sách Tổ 4 - đã xếp.xlsx" --to 4
+ * Tuy cot khac nhau giua cac to nen bat buoc truyen --to de doc dung cot ten /
+ * cot quan he / cot STT nguoi.
+ */
 const path = require('path');
 const E = require('exceljs');
 const { DEFAULTS } = require('../src/lib/sources');
+const { COT_THEO_TO } = require('../src/lib/to1');
 
-const FILE = process.argv[2] || path.join(DEFAULTS.outDir, 'Danh sách Tổ 1 - đã xếp.xlsx');
+const argv = process.argv.slice(2);
+const iTo = argv.indexOf('--to');
+const TO = parseInt(iTo >= 0 ? argv[iTo + 1] : 1, 10);
+const C = COT_THEO_TO[TO] || COT_THEO_TO[1];
+const FILE = argv.find((a) => !a.startsWith('--') && a !== String(TO)) ||
+  path.join(DEFAULTS.outDir, `Danh sách Tổ ${TO} - đã xếp.xlsx`);
 const s = (v) => (v == null ? '' : String(v).trim());
 
 (async () => {
@@ -12,10 +24,10 @@ const s = (v) => (v == null ? '' : String(v).trim());
   await wb.xlsx.readFile(FILE);
   const ws = wb.worksheets[0];
   const tong = ws.actualRowCount;
-  console.log(`File: ${FILE}`);
+  console.log(`File: ${FILE}   (Tổ ${TO})`);
   console.log(`Sheet "${ws.name}" - ${tong} dong\n`);
 
-  // quet tung dong: cot A (STT ho) / cot B (STT nguoi) / cot C (ten) / cot I (quan he)
+  // quet tung dong theo ban do cot cua tung to (xem COT_THEO_TO)
   const loi = [];
   const khoi = new Map(); // sttHo -> {dau, het, nChuHo, soNguoi}
   let chuaXacDinh = null; // nhom dot A = "." xep cuoi file
@@ -25,13 +37,14 @@ const s = (v) => (v == null ? '' : String(v).trim());
   for (let r = 3; r <= tong; r++) {
     const row = ws.getRow(r);
     const a = s(row.getCell(1).value);
-    const b = s(row.getCell(2).value);
-    const ten = s(row.getCell(3).value);
-    const cccd = s(row.getCell(6).value);
-    // quan he nam o cot 9 (khoi 1) hoac cot 8 (khoi 2 rut gon)
-    const c8 = s(row.getCell(8).value);
-    const c9 = s(row.getCell(9).value);
-    const qh = /^(chủ hộ|thành viên)$/.test(c9) ? c9 : /^(chủ hộ|thành viên)$/.test(c8) ? c8 : '';
+    // cot B chi la STT nguoi o To 1; o To 2/4 cot B la "Ho va ten"
+    const cotSttNguoi = 2 !== C.ten ? s(row.getCell(2).value) : '';
+    const ten = s(row.getCell(C.ten).value);
+    const cccd = s(row.getCell(C.cccd).value);
+    // quan he: dung cot da biet, thu them 2 cot ke
+    const qh = [C.quanHe, C.quanHe - 1, C.quanHe + 1]
+      .map((c) => s(row.getCell(c).value))
+      .find((v) => /^(chủ hộ|thành viên)$/.test(v)) || '';
 
     if (a !== '') {
       // dong chu ho moi -> bat dau khoi moi
@@ -42,9 +55,10 @@ const s = (v) => (v == null ? '' : String(v).trim());
         chuaXacDinh.het = r;
         chuaXacDinh.soNguoi++;
         cur = null;
-        const nb = Number(b);
+        if (cotSttNguoi === '') continue;
+        const nb = Number(cotSttNguoi);
         if (Number.isInteger(nb) && nb === sttNguoiTruoc + 1) sttNguoiTruoc = nb;
-        else loi.push(`r${r}: STT người "${b}" không nối tiếp (${sttNguoiTruoc})`);
+        else loi.push(`r${r}: STT người "${cotSttNguoi}" không nối tiếp (${sttNguoiTruoc})`);
         continue;
       }
       if (khoi.has(a)) loi.push(`r${r}: STT hộ ${a} xuất hiện lần 2 (lần trước ở khoi dòng ${khoi.get(a).dau})`);
@@ -63,9 +77,10 @@ const s = (v) => (v == null ? '' : String(v).trim());
     } else if (qh !== 'thành viên') {
       loi.push(`r${r}: thành viên ${ten} có quan hệ "${qh || 'trống'}"`);
     }
-    // STT nguoi phai chay lien tuc tu 1
-    const nb = Number(b);
-    if (!Number.isInteger(nb)) loi.push(`r${r}: STT người "${b}" không phải số`);
+    // STT nguoi phai chay lien tuc tu 1 (chi kiem tra neu to co cot STT nguoi)
+    if (cotSttNguoi === '') continue;
+    const nb = Number(cotSttNguoi);
+    if (!Number.isInteger(nb)) loi.push(`r${r}: STT người "${cotSttNguoi}" không phải số`);
     else if (nb !== sttNguoiTruoc + 1) loi.push(`r${r}: STT người nhảy ${sttNguoiTruoc} -> ${nb}`);
     else sttNguoiTruoc = nb;
   }

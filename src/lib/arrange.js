@@ -56,6 +56,7 @@ function copyWidths(wsNguon, wsDich) {
  * @param opts.outFile       file xlsx dau ra
  */
 async function xep({ srcFile, traFile, ap, to, recoverRange, headerRows: headerRowsOpt, outFile }) {
+  const C = to1.COT_THEO_TO[to] || to1.COT_THEO_TO[1];
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.readFile(srcFile);
   const ws = wb.worksheets[0];
@@ -129,13 +130,14 @@ async function xep({ srcFile, traFile, ap, to, recoverRange, headerRows: headerR
       dong.getCell(COT_STT_HO).value = '.'; // quy uoc cua chinh file goc
     }
     // dong chua gan ho: giu nguyen cot A cua file goc
-    // cot B: STT nguoi chay tu 1
-    dong.getCell(COT_STT_NGUOI).value = sttNguoi;
+    // cot B: STT nguoi chay tu 1 — CHI khi cot B khong phai cot ten
+    // (Tổ 2/4 đặt "Họ và tên" ở cột B, ghi vào sẽ xoá tên nên phải bỏ qua)
+    if (COT_STT_NGUOI !== C.TEN) dong.getCell(COT_STT_NGUOI).value = sttNguoi;
     nhatKy.push({
       sttNguoi,
       sttHo: hh.sttHo || 0,
       vaiTro,
-      hoTen: X.txt(gocDong(rowNguon).c[COT_TEN]),
+      hoTen: X.txt(gocDong(rowNguon).c[C.TEN]),
       cccd: X.cccdOf(gocDong(rowNguon).c[6]),
       dongCu: rowNguon,
       dongMoi: rDich,

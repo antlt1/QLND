@@ -290,13 +290,27 @@ console.log('\n== du lieu that ==');
       assert.strictEqual(l4.ap, 'Trường Bình');
       assert.ok(!/ A /.test(l4.traChon.ten), `phai la file goc, thuoc lai: ${l4.traChon.ten}`);
     });
-    t('chi to 1 moi bat khoi phuc STT ho', () => {
+    t('vung khoi phuc: chi To 1 va To 4, to khac phai TAT', () => {
       assert.strictEqual(locate(undefined, { to: 1 }).coKhoiPhuc, true);
-      for (const n of [2, 3, 4]) {
+      assert.strictEqual(locate(undefined, { to: 4 }).coKhoiPhuc, true);
+      for (const n of [2, 3, 5]) {
         const l = locate(undefined, { to: n });
         assert.strictEqual(l.coKhoiPhuc, false, `to ${n} phai TAT khoi phuc`);
         assert.strictEqual(to1.canRecover(200, l.recoverRange), false, `to ${n} khong duoc doan ho`);
       }
+    });
+    t('vung khoi phuc cua To 4 la 3-132 (thanh vien nam truoc chu ho)', () => {
+      const rr = locate(undefined, { to: 4 }).recoverRange;
+      assert.strictEqual(rr.from, 3);
+      assert.strictEqual(rr.to, 132);
+    });
+    t('ban do cot rieng cho tung to', () => {
+      const C = to1.COT_THEO_TO;
+      assert.strictEqual(C[1].ten, 3, 'to 1: ten o cot C');
+      assert.strictEqual(C[2].ten, 2, 'to 2: ten o cot B');
+      assert.strictEqual(C[4].ten, 2, 'to 4: ten o cot B');
+      assert.strictEqual(C[4].quanHe, 8, 'to 4: quan he o cot H');
+      assert.strictEqual(C[4].tuoi, 9, 'to 4: tuoi o cot I');
     });
     t('bo qua ban "- Copy" va file "chua tham gia BHYT"', () => {
       const tos = require('../src/lib/sources').listTos();

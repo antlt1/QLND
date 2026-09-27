@@ -17,8 +17,18 @@ const DEFAULTS = {
  */
 const TRA_THEO_TO = { 1: 'tra', 4: 'tra', 2: 'traA' };
 
-/** Vung duoc phep khoi phuc STT ho. Chi to 1 da xac dinh; to khac de trong de KHONG doan. */
-const RECOVER_THEO_TO = { 1: { from: 149, to: 325 } };
+/**
+ * Vung duoc phep khoi phuc STT ho (doi chieu CCCD voi danh sach tra).
+ *  - To 1: dong 149-325 la khoi bi chon dong giua ho 20 va ho 78.
+ *  - To 2: dong 3-160 la khoi thanh vien nam truoc dong chu ho dau tien.
+ *  - To 4: dong 3-132 la khoi thanh vien nam truoc chu ho (chu ho bat dau o dong 133).
+ *  - To khac: CHUA xac dinh -> tat, khong doan.
+ */
+const RECOVER_THEO_TO = {
+  1: { from: 149, to: 325 },
+  2: { from: 3, to: 160 },
+  4: { from: 3, to: 132 },
+};
 
 /** So dong tieu de o dau sheet (Tổ 1 xác định từ file, tổ khác dùng mặc định) */
 const HEADER_THEO_TO = { 1: 2 };
