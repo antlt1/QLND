@@ -290,10 +290,15 @@ console.log('\n== du lieu that ==');
       assert.strictEqual(l4.ap, 'Trường Bình');
       assert.ok(!/ A /.test(l4.traChon.ten), `phai la file goc, thuoc lai: ${l4.traChon.ten}`);
     });
-    t('vung khoi phuc: chi To 1 va To 4, to khac phai TAT', () => {
+    t('vung khoi phuc: chi To 1, To 2 va To 4', () => {
       assert.strictEqual(locate(undefined, { to: 1 }).coKhoiPhuc, true);
+      assert.strictEqual(locate(undefined, { to: 2 }).coKhoiPhuc, true);
       assert.strictEqual(locate(undefined, { to: 4 }).coKhoiPhuc, true);
-      for (const n of [2, 3, 5]) {
+      const r2 = locate(undefined, { to: 2 }).recoverRange;
+      assert.strictEqual(r2.from, 3);
+      assert.strictEqual(r2.to, 160);
+      assert.strictEqual(to1.canRecover(100, r2), true);
+      for (const n of [3, 5]) {
         const l = locate(undefined, { to: n });
         assert.strictEqual(l.coKhoiPhuc, false, `to ${n} phai TAT khoi phuc`);
         assert.strictEqual(to1.canRecover(200, l.recoverRange), false, `to ${n} khong duoc doan ho`);
