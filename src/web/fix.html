@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sửa Excel — Fix route</title>
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="fix.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Sửa Excel từng dòng — Tổ 1</h1>
+      <div class="stats" id="stats">Đang tải…</div>
+    </header>
+
+    <div class="bar">
+      <a class="nut" href="index.html">← Về danh sách hộ</a>
+      <label class="chk">Dòng từ <input id="from" type="number" value="1" min="1" /></label>
+      <label class="chk">đến <input id="to" type="number" value="148" min="1" /></label>
+      <button id="load" class="nut chinh">Xem</button>
+      <span class="het"></span>
+      <button id="fixAll" class="nut">Sửa tự động chắc chắn</button>
+      <button id="save" class="nut chinh">Lưu file Excel</button>
+      <button id="log" class="nut">Nhật ký sửa</button>
+      <span class="count" id="count"></span>
+    </div>
+
+    <div class="diemdinh" id="diemdinh">
+      <button class="nut" id="truoc">◀ Dòng trước</button>
+      <span class="viTri">Dòng <b id="dongHienTai">—</b> / <span id="tongDong">—</span></span>
+      <button class="nut" id="sau">Dòng sau ▶</button>
+      <span class="het"></span>
+      <label class="chk"><input type="checkbox" id="chiLoi" /> Chỉ hiện dòng có vấn đề</label>
+    </div>
+
+    <div id="loiChung" class="loiChung" hidden></div>
+    <main id="view"></main>
+
+    <div id="panel" hidden></div>
+
+    <script src="fix.js"></script>
+  </body>
+</html>

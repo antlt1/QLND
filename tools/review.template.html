@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Duyệt dữ liệu Tổ 1 — Ấp Trường Bình</title>
+<style>
+:root{--bg:#0f1720;--card:#182231;--line:#2b3949;--txt:#e6edf3;--mut:#93a4b5;--ok:#2ea043;--warn:#d29922;--err:#f85149;--fix:#58a6ff}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--txt)}
+header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap;position:sticky;top:0;background:var(--bg);z-index:9}
+h1{font-size:17px;margin:0;font-weight:600}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+button.tab{background:var(--card);border:1px solid var(--line);color:var(--mut);padding:6px 13px;border-radius:6px;cursor:pointer;font-size:13px}
+button.tab.on{background:#1f6feb;border-color:#1f6feb;color:#fff;font-weight:600}
+main{padding:16px 20px 60px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+.card b{display:block;font-size:21px;line-height:1.25}
+.card span{color:var(--mut);font-size:12px}
+.bar{display:flex;height:26px;border-radius:6px;overflow:hidden;margin:10px 0 16px;font-size:12px}
+.bar div{display:flex;align-items:center;justify-content:center;color:#08121c;font-weight:700;min-width:34px}
+input[type=search],select{background:#0d1420;border:1px solid var(--line);color:var(--txt);padding:7px 10px;border-radius:6px;font-size:13px}
+.bar2{display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card);border-radius:8px;overflow:hidden}
+th,td{padding:6px 9px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:#1c2735;font-weight:600;position:sticky;top:0;cursor:pointer;user-select:none}
+th:hover{color:#fff}
+tr:hover td{background:#1b2634}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:1px 7px;border-radius:11px;font-size:11px;font-weight:600}
+.t-fix{background:#12263a;color:#58a6ff;border:1px solid #1f6feb}
+.t-warn{background:#2b2410;color:#d29922;border:1px solid #9e6a03}
+.t-err{background:#2d1414;color:#f85149;border:1px solid #b62324}
+.t-ok{background:#12261a;color:#3fb950;border:1px solid #238636}
+.t-unk{background:#241f2e;color:#a371f7;border:1px solid #8957e5}
+.ghiChu{color:#d29922;font-size:12px;white-space:normal;max-width:520px}
+.gap{height:5px}
+.hide{display:none}
+.note{background:#12263a;border:1px solid #1f6feb;border-left-width:3px;padding:10px 13px;border-radius:6px;margin-bottom:14px;font-size:13px}
+.note b{color:#58a6ff}
+details{margin:8px 0 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 13px}
+summary{cursor:pointer;font-weight:600;font-size:13px}
+.muted{color:var(--mut)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Duyệt dữ liệu Tổ 1 — Ấp Trường Bình</h1>
+  <nav>
+    <button class="tab on" data-t="ho">Hộ / Thành viên</button>
+    <button class="tab" data-t="nguoi">Bảng người</button>
+    <button class="tab" data-t="loi">Lỗi cần kiểm tra</button>
+    <button class="tab" data-t="tra">Tra cứu Trường Bình</button>
+  </nav>
+</header>
+<main>
+  <div class="cards" id="cards"></div>
+  <div class="bar" id="bar"></div>
+
+  <section id="s-ho">
+    <details><summary>Chú thích 3 khung dữ liệu</summary>
+      <div class="gap"></div>
+      <p><span class="tag t-fix">1 · Hộ 1–27</span> Đã sửa xong. Mỗi hộ có đúng 1 dòng “chủ hộ” ở đầu.</p>
+      <p><span class="tag t-warn">2 · Hộ 28–78</span> Thành viên bị chồn dòng: mỗi hộ bị đánh dấu “chủ hộ” ở nhiều người, cần tra <b>Danh sách Trường Bình</b> để thêm vào.</p>
+      <p><span class="tag t-unk">3 · Hộ 79–140</span> Chưa cập nhật từ danh sách Trường Bình.</p>
+      <p class="muted">Cột A = STT hộ (chỉ ghi ở dòng chủ hộ). STT người đã đánh lại liên tục 1…598. Không xoá dòng nào.</p>
+    </details>
+    <div class="bar2">
+      <input type="search" id="qHo" placeholder="Tìm tên, CCCD, mã BH, số hộ…" size="34">
+      <select id="fKhung"><option value="">Tất cả khung</option></select>
+      <label class="muted"><input type="checkbox" id="cSuaCh"> Chỉ hiện hộ có cảnh báo</label>
+    </div>
+    <table id="tHo"></table>
+  </section>
+
+  <section id="s-nguoi" class="hide">
+    <div class="bar2">
+      <input type="search" id="qNguoi" placeholder="Tìm trong 598 người…" size="34">
+      <select id="fKhung2"><option value="">Tất cả khung</option></select>
+    </div>
+    <table id="tNguoi"></table>
+  </section>
+
+  <section id="s-loi" class="hide">
+    <div class="bar2"><input type="search" id="qLoi" placeholder="Lọc lỗi…" size="34"></div>
+    <table id="tLoi"></table>
+  </section>
+
+  <section id="s-tra" class="hide">
+    <div class="bar2">
+      <input type="search" id="qTra" placeholder="Tìm trong 1623 người của danh sách tra…" size="34">
+      <span class="muted">Dùng để tra khi thêm thành viên vào hộ. Không tự động ghi vào Tổ 1.</span>
+    </div>
+    <table id="tTra"></table>
+  </section>
+</main>
+<script id="data-to1" type="application/json">__TO1__</script>
+<script id="data-loi" type="application/json">__LOI__</script>
+<script id="data-tra" type="application/json">__TRA__</script>
+<script>
+const TO1=JSON.parse(document.getElementById('data-to1').textContent);
+const LOI=JSON.parse(document.getElementById('data-loi').textContent);
+const TRA=JSON.parse(document.getElementById('data-tra').textContent);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KHUNG={'1_DA_FIX':['1 · Hộ 1–27','t-fix'],'2_CHUA_FIX_THANH_VIEN_BI_CHON':['2 · Hộ 28–78','t-warn'],'3_CHUA_CAP_NHAT':['3 · Hộ 79–140','t-unk'],'KHONG_XAC_DINH':['Lỗi cột A','t-err'],'NGOAI_PHU':['Ngoài phụ lục','t-err']};
+const flat=[];TO1.ho.forEach(h=>h.thanhVien.forEach(m=>flat.push(Object.assign({},m,{_ho:h.sttHo,_khung:h.khung,_goiY:h.goiY}))));
+
+// cards + bar
+const KH=[['1_DA_FIX','#58a6ff'],['2_CHUA_FIX_THANH_VIEN_BI_CHON','#d29922'],['3_CHUA_CAP_NHAT','#a371f7'],['KHONG_XAC_DINH','#f85149']];
+const nLoi=LOI.length, nH=TO1.ho.length, nC=flat.length;
+const cbTrung=LOI.filter(l=>l.code==='CCCD_TRUNG').length;
+document.getElementById('cards').innerHTML=
+ `<div class="card"><b>${TO1.ap} — Tổ ${TO1.to}</b><span>${esc(TO1.nguon)}</span></div>
+  <div class="card"><b>${nH}</b><span>hộ (143 dòng chủ hộ)</span></div>
+  <div class="card"><b>${nC}</b><span>cán bộ</span></div>
+  <div class="card"><b>${nLoi}</b><span>cảnh báo</span></div>
+  <div class="card"><b>${cbTrung/2}</b><span>CCCD bị trùng</span></div>
+  <div class="card"><b>${TRA.length}</b><span>người trong DS tra</span></div>`;
+const tot=nH||1;
+document.getElementById('bar').innerHTML=KH.map(([k,col])=>{
+  const hs=TO1.ho.filter(h=>h.khung===k); if(!hs.length) return '';
+  const n=hs.reduce((a,h)=>a+h.soNguoi,0);
+  return `<div style="width:${hs.length/tot*100}%;background:${col}" title="${esc(KHUNG[k][0])}: ${hs.length} hộ, ${n} người">${esc(KHUNG[k][0])} · ${hs.length} hộ</div>`;
+}).join('');
+
+const sel=document.getElementById('fKhung'), sel2=document.getElementById('fKhung2');
+Object.keys(KHUNG).forEach(k=>{
+  if(!TO1.ho.some(h=>h.khung===k))return;
+  const l=esc(KHUNG[k][0]);
+  sel.insertAdjacentHTML('beforeend',`<option value="${k}">${l}</option>`);
+  sel2.insertAdjacentHTML('beforeend',`<option value="${k}">${l}</option>`);
+});
+
+function tbl(el,cols,rows,empty){
+  el.innerHTML='<thead><tr>'+cols.map(c=>`<th>${esc(c[0])}</th>`).join('')+'</tr></thead><tbody>'+
+    (rows.length?rows.map(r=>'<tr>'+cols.map(c=>`<td class="${c[2]||''}">${c[1](r)}</td>`).join('')+'</tr>').join('')
+     :`<tr><td colspan="${cols.length}" class="muted" style="text-align:center;padding:20px">${empty}</td></tr>`)+'</tbody>';
+}
+const C_HO=[1,'TT',''],[2,'STT hộ',''],[3,'Kh?',''],[4,'Chủ hộ',''],[5,'Từ dòng',''],[6,'Đến dòng',''],[7,'SL',''],[8,'Cảnh báo','ghiChu'],[9,'Gợi ý','ghiChu'];
+const C_TV=(h)=>[['TT',m=>m.sttNguoi],['STT hộ',m=>m.sttHo||'.'],['Họ tên',m=>`<b>${esc(m.hoTen)}</b>`],['Quan hệ',m=>esc(m.quanHe||'—')],['Vai trò',m=>m.vaiTro==='chuHo'?'<span class="tag t-ok">chủ hộ</span>':'thành viên'],['Năm sinh',m=>esc((m.ngaySinh||'—').slice(0,4))],['CCCD',m=>esc(m.cccd||'—')],['Mã BH',m=>esc(m.maBH||'—')],['Tuổi',m=>m.tuoi??'—'],['Nghề',m=>esc(m.ngheNghiep||'—')],['Đất (vườn)',m=>m.datDai&&m.datDai.vuon&&(m.datDai.vuon.cay||m.datDai.vuon.dienTich)?esc(m.datDai.vuon.cay)+' '+(m.datDai.vuon.dienTich?m.datDai.vuon.dienTich+'m²':''):'—'],['Cảnh báo',m=>m.canhBao&&m.canhBao.length?'<span class="tag t-warn">'+esc(m.canhBao.join(', '))+'</span>':'']];
+
+const tHo=document.getElementById('tHo');
+let hoState=TO1.ho.map((h,i)=>({h,i}));
+function drawHo(){
+  const q=document.getElementById('qHo').value.trim().toLowerCase();
+  const k=document.getElementById('fKhung').value;
+  const cs=document.getElementById('cSuaCh').checked;
+  const rs=hoState.filter(({h})=>{
+    if(k&&h.khung!==k)return false;
+    if(cs&&!(h.canhBao&&h.canhBao.length))return false;
+    if(!q)return true;
+    if(String(h.sttHoGoc).includes(q))return true;
+    if((h.chuHo||'').toLowerCase().includes(q))return true;
+    return h.thanhVien.some(m=>[m.hoTen,m.cccd,m.maBH].some(x=>(x||'').toLowerCase().includes(q)));
+  });
+  tHo.innerHTML='<thead><tr>'+C_HO.map(c=>`<th>${esc(c[0])}</th>`).join('')+'</tr></thead><tbody>'+
+   rs.map(({h,i})=>{
+    const kk=KHUNG[h.khung]||['?','t-err'];
+    const cb=(h.canhBao||[]).filter(x=>!/^NGUOI_R/.test(x));
+    const warn=(h.soNguoi===1||cb.length);
+    return `<tr style="cursor:pointer" data-i="${i}">
+      <td class="muted">▸</td>
+      <td><b>${esc(h.sttHoGoc)}</b></td>
+      <td><span class="tag ${kk[1]}">${esc(kk[0])}</span></td>
+      <td>${esc(h.chuHo||'—')}</td>
+      <td class="num">${h.rowExcel}</td><td class="num">${h.rowCuoi}</td>
+      <td class="num"><b>${h.soNguoi}</b>${warn?' <span class="tag t-warn">!</span>':''}</td>
+      <td class="ghiChu">${cb.length?cb.map(esc).join(' · '):''}${h.goiY?'<br><b>Gợi ý:</b> '+esc(h.goiY):''}</td>
+      <td class="ghiChu"></td></tr>
+      <tr class="sub hide" data-s="${i}"><td></td><td colspan="8" style="padding:0 0 10px 22px;white-space:normal">
+        <table style="font-size:12px"><thead><tr>${C_TV().map(c=>`<th>${esc(c[0])}</th>`).join('')}</tr></thead>
+        <tbody>${h.thanhVien.map(m=>'<tr>'+C_TV().map(c=>`<td>${c[1](m)}</td>`).join('')+'</tr>').join('')}</tbody></table></td></tr>`;
+   }).join('')+'</tbody>';
+}
+tHo.onclick=e=>{
+  const r=e.target.closest('tr[data-i]'); if(!r)return;
+  document.querySelector(`tr[data-s="${r.dataset.i}"]`).classList.toggle('hide');
+  r.firstElementChild.textContent=document.querySelector(`tr[data-s="${r.dataset.i}"]`).classList.contains('hide')?'▸':'▾';
+};
+
+const C_NG=[['TT',r=>r.sttNguoi],['STT hộ',r=>r._ho||'.'],['Khống',r=>{const k=KHUNG[r._khung]||['?','t-err'];return `<span class="tag ${k[1]}">${esc(k[0])}</span>`}],['Họ tên',r=>`<b>${esc(r.hoTen)}</b>`],['Quan hệ',r=>esc(r.quanHe||'—')],['Năm sinh',r=>esc((r.ngaySinh||'—').slice(0,4))],['Tuổi',r=>r.tuoi??'—'],['CCCD',r=>esc(r.cccd||'—')],['Mã BH',r=>esc(r.maBH||'—')],['Nghề',r=>esc(r.ngheNghiep||'—')],['ĐT',r=>esc(r.dienThoai||'—')],['Học vấn',r=>esc(r.duHoc||'—')],['Cảnh báo',r=>r.canhBao&&r.canhBao.length?'<span class="tag t-warn">'+esc(r.canhBao.join(', '))+'</span>':''],['Dòng',r=>`<span class="muted">${r.row}</span>`]];
+function drawNguoi(){
+  const q=document.getElementById('qNguoi').value.trim().toLowerCase();
+  const k=document.getElementById('fKhung2').value;
+  const rs=flat.filter(r=>(!k||r._khung===k)&&(!q||[r.hoTen,r.cccd,r.maBH,r._ho].some(x=>String(x||'').toLowerCase().includes(q))));
+  tbl(document.getElementById('tNguoi'),C_NG,rs,'Không tìm thấy');
+}
+
+const C_LOI=[['Dòng',r=>r.row],['STT hộ',r=>r.ho],['Họ tên',r=>`<b>${esc(r.ten)}</b>`],['Mã lỗi',r=>'<span class="tag t-warn">'+esc(r.code)+'</span>'],['Mô tả',r=>esc(r.moTa)]];
+function drawLoi(){
+  const q=document.getElementById('qLoi').value.trim().toLowerCase();
+  tbl(document.getElementById('tLoi'),C_LOI,LOI.filter(l=>!q||[l.code,l.ten,l.moTa,l.ho].some(x=>String(x||'').toLowerCase().includes(q))),'Không có lỗi');
+}
+
+const C_TRA=[['TT',r=>r.stt],['Họ tên',r=>`<b>${esc(r.hoTen)}</b>`],['Quan hệ',r=>esc(r.quanHe||'—')],['Hộ',r=>r.hoTraStt],['Năm sinh',r=>esc((r.ngaySinh||'—').slice(0,4))],['CCCD',r=>esc(r.cccd||'—')],['Mã BH',r=>esc(r.soDinhDanh||'—')]];
+function drawTra(){
+  const q=document.getElementById('qTra').value.trim().toLowerCase();
+  tbl(document.getElementById('tTra'),C_TRA,TRA.filter(r=>!q||[r.hoTen,r.cccd,r.soDinhDanh].some(x=>String(x||'').toLowerCase().includes(q))),'Không tìm thấy');
+}
+
+['qHo','fKhung','cSuaCh','qNguoi','fKhung2','qLoi','qTra'].forEach(id=>{
+  const e=document.getElementById(id);
+  e.addEventListener('input',()=>({qHo:drawHo,fKhung:drawHo,cSuaCh:drawHo,qNguoi:drawNguoi,fKhung2:drawNguoi,qLoi:drawLoi,qTra:drawTra})[id]());
+  if(e.tagName==='SELECT')e.addEventListener('change',e.dispatchEvent.bind(e,new Event('input')));
+});
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  ['ho','nguoi','loi','tra'].forEach(t=>document.getElementById('s-'+t).classList.toggle('hide',t!==b.dataset.t));
+});
+drawHo();drawNguoi();drawLoi();drawTra();
+</script>
+</body>
+</html>

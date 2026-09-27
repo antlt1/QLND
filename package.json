@@ -1,0 +1,22 @@
+{
+  "name": "qlnd",
+  "version": "1.0.0",
+  "description": "Quản lý danh sách hộ cán bộ ấp Trường Bình",
+  "main": "src/lib/to1.js",
+  "scripts": {
+    "extract": "node src/cli/extract.js",
+    "excel": "node src/cli/excel.js",
+    "build": "node src/cli/build.js",
+    "fixroute": "node src/cli/fixroute.js",
+    "serve": "node src/cli/serve.js",
+    "test": "node test/run.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "firebase": "^12.19.0"
+  }
+}

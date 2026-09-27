@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Danh sách hộ</title>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Danh sách hộ — Ấp Trường Bình, Tổ 1</h1>
+      <div class="stats" id="stats"></div>
+    </header>
+
+    <nav class="tabs">
+      <button data-tab="ho" class="on">Danh sách hộ</button>
+      <button data-tab="nguoi">Danh sách người</button>
+      <button data-tab="canhbao">Cảnh báo</button>
+      <button data-tab="ghichu">Ghi chú</button>
+    </nav>
+
+    <div class="bar">
+      <input id="q" type="search" placeholder="Tìm tên, STT hộ, CCCD, số điện thoại…" />
+      <select id="khung">
+        <option value="">Tất cả khối</option>
+        <option value="1_DA_FIX">1 — Đã sửa xong</option>
+        <option value="2_CHUA_FIX_THANH_VIEN_BI_CHON">2 — Thành viên bị chồn dòng</option>
+        <option value="3_CHUA_CAP_NHAT">3 — Chưa cập nhật</option>
+        <option value="STT_HO_RAC">Cột A rác (dấu .)</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="onlyCb" /> Chỉ hiện dòng có cảnh báo</label>
+      <span class="count" id="count"></span>
+      <a class="nut" href="fix.html">Sửa Excel dòng 1–148 →</a>
+    </div>
+
+    <main id="view"></main>
+    <div id="detail" hidden></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

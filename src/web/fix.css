@@ -1,0 +1,107 @@
+/* Bo sung cho trang fix route - dung chung bien voi app.css */
+
+/* --- thanh dieu khong --- */
+.nut {
+  border: 1px solid var(--duong);
+  background: #fff;
+  color: #33475b;
+  padding: 7px 12px;
+  border-radius: 4px;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  white-space: nowrap;
+}
+.nut:hover { background: var(--xanh-nhat); border-color: var(--xanh); }
+.nut.chinh { background: var(--xanh); color: #fff; border-color: var(--xanh); font-weight: 600; }
+.nut.chinh:hover { background: #17395a; }
+.nut:disabled { opacity: .5; cursor: default; }
+.het { flex: 1 1 auto; }
+.bar input[type=number] { width: 74px; }
+
+.diemdinh {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  padding: 10px 20px; background: var(--xanh-nhat);
+  border-bottom: 1px solid var(--duong);
+  position: sticky; top: 0; z-index: 6;
+}
+.viTri { color: #33475b; font-variant-numeric: tabular-nums; }
+.viTri b { font-size: 16px; color: var(--xanh); }
+
+.loiChung {
+  margin: 14px 20px 0; padding: 11px 14px; border-radius: 5px;
+  background: #fbe3e1; color: #7d231a; border: 1px solid #f0b7b1;
+}
+
+/* --- bang duyet dong --- */
+table.route { table-layout: fixed; font-size: 13px; }
+table.route th.dong, table.route td.dong {
+  width: 52px; text-align: right; color: #64748b; font-variant-numeric: tabular-nums;
+}
+table.route td.cot { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+table.route th.ten {
+  position: static; background: var(--xanh); color: #fff; text-transform: none;
+  letter-spacing: 0; font-size: 11.5px; font-weight: 600; border-bottom: 0;
+}
+table.route th.ten i { display: block; font-style: normal; font-weight: 400; opacity: .75; font-size: 10.5px; }
+
+/* trang thai dong */
+tr.r-tieude { background: #f1f5f9; color: #64748b; font-style: italic; }
+tr.r-ok td.dong { box-shadow: inset 3px 0 0 var(--xanh-ok); }
+tr.r-nghi { background: #fdf9ec; }
+tr.r-nghi td.dong { box-shadow: inset 3px 0 0 var(--vang); }
+tr.r-sai { background: #fdf1f0; }
+tr.r-sai td.dong { box-shadow: inset 3px 0 0 var(--do); }
+tr.hienTai { outline: 2px solid var(--xanh); outline-offset: -2px; }
+tr.dangSua td.o { background: #fffbe6; }
+
+/* o sua duoc */
+td.o {
+  cursor: text; border-left: 1px solid #f1f5f9; white-space: pre-wrap;
+  word-break: break-word;
+}
+td.o:hover { background: #f8fbff; }
+td.o.sai { color: var(--do); font-weight: 600; }
+td.o.nghi { color: var(--vang); }
+td.o.rong { background: repeating-linear-gradient(45deg, #fbfcfd, #fbfcfd 4px, #f4f6f8 4px, #f4f6f8 8px); }
+
+td.sua { width: 100%; }
+td.sua input {
+  width: 100%; padding: 3px 5px; font: inherit; border: 1px solid var(--xanh);
+  border-radius: 3px;
+}
+
+/* bang loi cua dong */
+td.tt { width: 300px; font-size: 12px; }
+ul.loi { margin: 0; padding: 0; list-style: none; }
+ul.loi li { padding: 1px 0; }
+ul.loi li b { font-weight: 600; }
+ul.loi .sai b { color: var(--do); }
+ul.loi .nghi b { color: var(--vang); }
+ul.loi em { color: #64748b; font-style: normal; }
+
+.tag.trangthai { font-size: 11px; padding: 1px 7px; border-radius: 9px; white-space: nowrap; }
+.tt-ok { background: #e3f2e5; color: var(--xanh-ok); }
+.tt-nghi { background: #fdf3d8; color: var(--vang); }
+.tt-sai { background: #fbe3e1; color: var(--do); }
+.tt-tieude { background: #eef1f4; color: #64748b; }
+
+/* panel ben phai */
+#panel {
+  position: fixed; inset: 0 0 0 auto; width: min(620px, 100%);
+  background: #fff; border-left: 1px solid var(--duong);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, .08); overflow: auto; z-index: 20;
+}
+#panel header {
+  position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center;
+}
+#panel header h2 { margin: 0; font-size: 15px; }
+#panel .close { background: none; border: 0; color: #fff; font-size: 22px; cursor: pointer; line-height: 1; }
+#panel .body { padding: 14px 18px; }
+#panel table { font-size: 13px; }
+#panel td:first-child { color: #64748b; width: 34%; }
+#panel .cu { color: var(--do); }
+#panel .moi { color: var(--xanh-ok); font-weight: 600; }
+#panel h3 { font-size: 12px; text-transform: uppercase; color: #64748b; margin: 18px 0 6px; }
+#panel .rong { color: #94a3b8; padding: 30px; text-align: center; }
