@@ -9,7 +9,9 @@
     "build": "node src/cli/build.js",
     "fixroute": "node src/cli/fixroute.js",
     "serve": "node src/cli/serve.js",
-    "test": "node test/run.js"
+    "dev": "vite",
+    "preview": "vite preview",
+    "build:client": "vite build"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +19,12 @@
   "type": "commonjs",
   "dependencies": {
     "exceljs": "^4.4.0",
-    "firebase": "^12.19.0"
+    "firebase": "^12.19.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.2"
   }
 }

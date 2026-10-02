@@ -1,0 +1,89 @@
+:root {
+  --xanh: #1f4e79;
+  --xanh-nhat: #eaf1f8;
+  --nhat: #eef1f4;
+  --do: #c0392b;
+  --vang: #b8860b;
+  --tim: #6b3fa0;
+  --xanh-ok: #2e7d32;
+  --duong: #b0b7c3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 14px/1.5 "Segoe UI", system-ui, sans-serif;
+  color: #1a1a1a;
+  background: #f6f8fa;
+}
+header {
+  background: var(--xanh);
+  color: #fff;
+  padding: 14px 20px;
+}
+h1 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
+.stats { font-size: 13px; opacity: .92; display: flex; gap: 18px; flex-wrap: wrap; }
+.stats b { font-weight: 600; }
+
+.tabs { display: flex; gap: 2px; padding: 0 20px; background: var(--xanh-nhat); }
+.tabs button {
+  border: 0; background: transparent; padding: 10px 16px; cursor: pointer;
+  font: inherit; color: #33475b; border-bottom: 3px solid transparent;
+}
+.tabs button.on { color: var(--xanh); border-bottom-color: var(--xanh); font-weight: 600; }
+
+.bar {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  padding: 12px 20px; background: #fff; border-bottom: 1px solid var(--duong);
+  position: sticky; top: 0; z-index: 5;
+}
+.bar input[type=search] { flex: 1 1 260px; min-width: 200px; }
+.bar input, .bar select {
+  padding: 7px 10px; border: 1px solid var(--duong); border-radius: 4px; font: inherit;
+}
+.bar input[type=search]:focus, .bar select:focus { outline: 2px solid var(--xanh-nhat); border-color: var(--xanh); }
+.chk { display: flex; align-items: center; gap: 6px; color: #33475b; white-space: nowrap; }
+.count { color: #64748b; font-variant-numeric: tabular-nums; }
+
+main { padding: 0 20px 60px; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--nhat); }
+th {
+  position: sticky; top: 53px; background: #fff; z-index: 2;
+  font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: #64748b;
+  border-bottom: 2px solid var(--duong);
+}
+tbody tr:hover { background: var(--xanh-nhat); cursor: pointer; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.tag {
+  display: inline-block; padding: 1px 7px; border-radius: 10px;
+  font-size: 11.5px; white-space: nowrap;
+}
+.k1 { background: #e3f2e5; color: var(--xanh-ok); }
+.k2 { background: #fdf3d8; color: var(--vang); }
+.k3 { background: #ede4f7; color: var(--tim); }
+.kr { background: #fbe3e1; color: var(--do); }
+.cb { color: var(--do); font-size: 12px; }
+.goiy { color: var(--vang); font-size: 12px; font-style: italic; }
+
+#detail {
+  position: fixed; inset: 0 0 0 auto; width: min(520px, 100%);
+  background: #fff; border-left: 1px solid var(--duong);
+  box-shadow: -4px 0 20px rgba(0,0,0,.08); overflow: auto; padding: 0 0 40px;
+}
+#detail header { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; }
+#detail header h2 { margin: 0; font-size: 15px; }
+#detail .close { background: none; border: 0; color: #fff; font-size: 22px; cursor: pointer; line-height: 1; }
+#detail .body { padding: 14px 18px; }
+#detail h3 { font-size: 12px; text-transform: uppercase; color: #64748b; margin: 18px 0 6px; }
+#detail table { font-size: 13px; }
+#detail td:first-child { color: #64748b; width: 42%; }
+.empty { padding: 40px; text-align: center; color: #94a3b8; }
+
+/* nut chung (dung o ca trang chinh va trang fix) */
+.nut {
+  border: 1px solid var(--duong); background: #fff; color: #33475b;
+  padding: 7px 12px; border-radius: 4px; font: inherit; cursor: pointer;
+  text-decoration: none; display: inline-block; white-space: nowrap;
+}
+.nut:hover { background: var(--xanh-nhat); border-color: var(--xanh); }
